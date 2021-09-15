@@ -1,0 +1,15 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.InfoBeltWidgetViewModel
+
+@if (Model != null && Model.ShowWidget)
+{
+    <div class="opy-info-belt" style="@Model.WrapperCss">
+        <opy-info-belt color="@Model.Logo"></opy-info-belt>
+    </div>
+
+    if (Model.StickyInfoBeltWidget)
+    {
+        <script type="text/javascript">
+            @Model.StickyScript
+        </script>
+    }
+}

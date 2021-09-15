@@ -1,0 +1,8 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.ProductListingWidgetViewModel
+
+@if (Model != null && Model.ShowWidget)
+{
+    <div class="opy-product-listing" style="@Model.WrapperCss">
+        <opy-product-listing amount="@Model.ProductPrice" logo="@Model.ListingPageWidgetLogo" hide-logo="@Model.HideLogo.ToString()"></opy-product-listing>
+    </div>
+}

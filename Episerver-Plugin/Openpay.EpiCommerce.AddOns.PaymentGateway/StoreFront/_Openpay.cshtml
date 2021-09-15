@@ -1,0 +1,13 @@
+﻿@using System.Web.Mvc.Html
+@using EPiServer.Web.Mvc.Html
+@using Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
+@model EPiServer.Commerce.Order.IPaymentMethod
+@Html.HiddenFor(model => model.SystemKeyword)
+
+@{
+    var openpayConfigBlock = WidgetViewModelFactory.GetConfigurationBlock();
+    if (openpayConfigBlock != null && openpayConfigBlock.ShowCheckoutPageWidget)
+    {
+        Html.RenderXhtmlString(openpayConfigBlock.InstalmentText);
+    }
+}
