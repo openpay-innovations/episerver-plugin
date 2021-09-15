@@ -1,0 +1,16 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.ProductPageWidgetViewModel
+
+@if (Model != null && Model.ShowProductPageWidget)
+{
+    <div class="opy-product-page" style="@Model.WrapperCss">
+        <opy-product-page
+            amount="@Model.ProductPrice"
+            logo="@Model.ProductPageLogo"
+            logo-position="@Model.ProductPageLogoPosition"
+            more-info-text="@(!string.IsNullOrWhiteSpace(Model.ProductPageLearnMoreText) ? Model.ProductPageLearnMoreText : "Learn more")"
+            info-icon="@Model.InfoIcon"
+        >
+        </opy-product-page>
+    </div>
+    
+}

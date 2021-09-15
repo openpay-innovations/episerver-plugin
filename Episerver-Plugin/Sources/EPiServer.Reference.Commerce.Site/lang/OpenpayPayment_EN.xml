@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<languages>
+	<language name="English" id="en">
+		<Commerce>
+			<Checkout>
+				<Openpay>
+					<PaymentNotSpecified>Payment information is not specified.</PaymentNotSpecified>
+					<ProcessPaymentNullHttpContext>HttpContext.Current is null.</ProcessPaymentNullHttpContext>
+					<PaymentNotAssociatedOrderForm>Payment must be associated with an order form.</PaymentNotAssociatedOrderForm>
+					<OpenpaySettingsError>Error in Openpay Payment settings. Please contact site's administrator.</OpenpaySettingsError>
+					<InvalidCustomerInfo> Billing or Shipping address are lacking of info. Please make sure to fill in Line1, City, Region and PostalCode.</InvalidCustomerInfo>
+					<CheckoutProcessError> Payment transaction cannot be completed.  Please contact site's administrator.</CheckoutProcessError>
+					<CancelMessage> Openpay transaction was cancelled.</CancelMessage>
+					<FailureMessage> There's some failures occur during the Openpay payment process.</FailureMessage>
+					<PaymentCaptureError> There's some failures occur during the Openpay capture payment process.</PaymentCaptureError>
+					<PlanPurchasePriceCompareError> There's some failures occur during the comparision payment information with Openpay.</PlanPurchasePriceCompareError>
+					<EpiCreateCaptureTransactionError> Your order have created successfully but some errors occur in capture order. Please contact site's administrator about this notification !</EpiCreateCaptureTransactionError>
+					<ProcessPaymentStatusCompleted> This order has already paid in Openpay Payment.</ProcessPaymentStatusCompleted>
+					<InvalidPurchasePrice> The total price is out of the purchase minimum or maximum limitation of Openpay Payment.</InvalidPurchasePrice>
+					<IncludeProhibitedProduct> This order include products prohibited by Openpay Payment policy.</IncludeProhibitedProduct>
+					<OpenpayRefundError> Errors occurred. Refund transaction cannot be completed.</OpenpayRefundError>
+					<RefundMoreThanPurchasePrice> New Purchase Price is greater than current Purchase Price.</RefundMoreThanPurchasePrice>
+					<GetOrderStatusApiError> Cannot get order status from Openpay API.</GetOrderStatusApiError>
+					<NotEnoughStockWarning> Payment completed but not enough stock. Please contact administrators.</NotEnoughStockWarning>
+					<CartValidationWarning> An error occurred when processing cart.</CartValidationWarning>
+					<PlanStatusIsNotActive> Openpay plan must be Active for this feature to apply.</PlanStatusIsNotActive>
+				</Openpay>
+			</Checkout>
+		</Commerce>
+	</language>
+</languages>

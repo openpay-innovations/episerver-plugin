@@ -1,0 +1,20 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes.OpenpayWidgetConfigurationBlock
+
+@if (Model != null)
+{
+    <script src="https://widgets.openpay.com.au/lib/openpay-widgets.min.js"></script>
+    <script>
+        var configObject = {
+            region: "@Model.Region",
+            planTiers: [@(string.Join(",", Model.PlanTiers))],
+            minEligibleAmount: @Model.MinEligibleAmount,
+            maxEligibleAmount: @Model.MaxEligibleAmount,
+            type: "@Model.Type"
+        };
+        var currency = "@Model.Currency";
+        if (currency) {
+            configObject.currency = currency;
+        }
+        OpenpayWidgets.Config(configObject);
+    </script>
+}

@@ -1,0 +1,19 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.CheckoutWidgetViewModel
+
+@if (Model != null && Model.ShowCheckoutWidget)
+{
+    if (Model.ShowLogoWidget)
+    {
+        <span class="opy-logo" style="@Model.WrapperCss">
+            <opy-logo color="@Model.Logo"></opy-logo>
+        </span>
+    }
+
+    if (Model.ShowLearnMoreWidget)
+    {
+        <span class="opy-learn-more-button">
+            <opy-learn-more-button more-info-text="@Model.LearnMore" info-icon="@Model.InfoIcon"></opy-learn-more-button>
+        </span>
+    }
+}
+
