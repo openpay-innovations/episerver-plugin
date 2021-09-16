@@ -310,7 +310,6 @@
     <Compile Include="Enums\OpenpayRegion.cs" />
     <Compile Include="Enums\OrderOrigin.cs" />
     <Compile Include="Enums\ShowInfoBeltOption.cs" />
-    <Compile Include="Helpers\CartService.cs" />
     <Compile Include="Helpers\EnumHelper.cs" />
     <Compile Include="Helpers\OpenpayConfiguration.cs" />
     <Compile Include="Helpers\OpenpayApiHelper.cs" />
@@ -361,7 +360,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="StoreFront\EPiServerLog.config" />
+    <None Include="EPiServerLog.config" />
     <Content Include="StoreFront\OpenpayInfoBeltWidgetBlock.cshtml" />
     <None Include="StoreFront\OpenpayCheckoutWidgetBlock.cshtml" />
     <None Include="StoreFront\OpenpayLogoWidgetBlock.cshtml" />

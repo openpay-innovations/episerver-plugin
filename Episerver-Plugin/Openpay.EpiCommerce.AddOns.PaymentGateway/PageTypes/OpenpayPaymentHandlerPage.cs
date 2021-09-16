@@ -7,7 +7,7 @@ using Openpay.EpiCommerce.AddOns.PaymentGateway.Constants;
 namespace Openpay.EpiCommerce.AddOns.PaymentGateway.PageTypes
 {
     [ContentType(GUID = "9836b8ac-1097-47dc-9e28-5f5223237966",
-        DisplayName = "Openpay Payment Page",
+        DisplayName = "Openpay Payment Handler Page",
         Description = "Openpay Payment handler process page.",
         GroupName = CommonConstants.OpenpayTabNames.OpenpayPage,
         Order = 100)]
