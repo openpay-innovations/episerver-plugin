@@ -39,6 +39,22 @@
             cache: false,
             success: function (result) {
                 Checkout.updateOrderSummary();
+                Cart.updatePaymentSelection();
+            }
+        });
+
+        // update payment selection section
+       
+    },
+    updatePaymentSelection: function() {
+        var paymentSelectionUrl = "/Payment/PaymentMethodSelection";
+        var paymentSelectionContainer = $("#PaymentSelectionId");
+        $.ajax({
+            type: "Get",
+            url: paymentSelectionUrl,
+            cache: false,
+            success: function (result) {
+                paymentSelectionContainer.html(result);
             }
         });
     },

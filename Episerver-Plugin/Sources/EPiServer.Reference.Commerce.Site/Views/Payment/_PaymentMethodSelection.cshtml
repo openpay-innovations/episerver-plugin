@@ -12,18 +12,23 @@
             @foreach (var viewModel in Model.PaymentMethods.Where(x => x.PaymentMethod != null))
             {
                 <div class="radio">
-                    <label>
+                    <label style="display: flex; align-items: center;">
                         @{ string checkState = viewModel.PaymentMethod.PaymentMethodId == Model.SelectedPaymentMethod.PaymentMethod.PaymentMethodId ? "checked" : string.Empty; }
-                        <input type="radio" class="jsChangePayment" data-url="@Url.Action("SetPaymentMethod", "Payment", new { paymentMethodId = viewModel.PaymentMethod.PaymentMethodId })" 
-                               name="SystemName" value="@viewModel.PaymentMethod.SystemKeyword" @checkState /> 
-                        @viewModel.PaymentMethod.Name
+                        <input type="radio" class="jsChangePayment" data-url="@Url.Action("SetPaymentMethod", "Payment", new { paymentMethodId = viewModel.PaymentMethod.PaymentMethodId })"
+                               name="SystemName" value="@viewModel.PaymentMethod.SystemKeyword" @checkState />
                         @if (viewModel.PaymentMethod.SystemKeyword == OpenpayConfigurationConstants.OpenpaySystemName)
                         {
+
+                            <img style="width: 70px; margin-right: 5px;" src="https://static.openpay.com.au/brand/logo/amber-lozenge-logo.svg">
                             var openpayCheckoutWidgetModel = WidgetViewModelFactory.GetCheckoutWidgetViewModel();
                             if (openpayCheckoutWidgetModel != null && openpayCheckoutWidgetModel.ShowCheckoutWidget)
                             {
                                 Html.RenderPartial("OpenpayCheckoutWidgetBlock", openpayCheckoutWidgetModel);
                             }
+                        }
+                        else
+                        {
+                            @viewModel.PaymentMethod.Name
                         }
                     </label>
                 </div>

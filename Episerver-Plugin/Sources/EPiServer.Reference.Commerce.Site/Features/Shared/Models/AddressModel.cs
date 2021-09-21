@@ -14,36 +14,36 @@ namespace EPiServer.Reference.Commerce.Site.Features.Shared.Models
 
         public string AddressId { get; set; }
 
-        [LocalizedRequired("/Shared/Address/Form/Empty/Name")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/Name")]
         [LocalizedDisplay("/Shared/Address/Form/Label/Name")]
         public string Name { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/FirstName")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/FirstName")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/FirstName")]
         public string FirstName { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/LastName")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/LastName")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/LastName")]
         public string LastName { get; set; }
 
         public string CountryName { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/CountryCode")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/CountryCode")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/CountryCode")]
         public string CountryCode { get; set; }
 
         public IEnumerable<CountryViewModel> CountryOptions { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/City")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/City")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/City")]
         public string City { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/PostalCode")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/PostalCode")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/PostalCode")]
         public string PostalCode { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/Line1")]
-        [LocalizedRequired("/Shared/Address/Form/Empty/Line1")]
+        //[LocalizedRequired("/Shared/Address/Form/Empty/Line1")]
         public string Line1 { get; set; }
 
         [LocalizedDisplay("/Shared/Address/Form/Label/Line2")]

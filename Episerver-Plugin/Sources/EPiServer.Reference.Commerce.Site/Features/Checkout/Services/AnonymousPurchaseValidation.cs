@@ -29,10 +29,10 @@ namespace EPiServer.Reference.Commerce.Site.Features.Checkout.Services
                 }
             }
 
-            if (string.IsNullOrEmpty(viewModel.BillingAddress.Email))
-            {
-                modelState.AddModelError("BillingAddress.Email", LocalizationService.GetString("/Shared/Address/Form/Empty/Email"));
-            }
+            //if (string.IsNullOrEmpty(viewModel.BillingAddress.Email))
+            //{
+            //    modelState.AddModelError("BillingAddress.Email", LocalizationService.GetString("/Shared/Address/Form/Empty/Email"));
+            //}
 
             return modelState.IsValid;
         }

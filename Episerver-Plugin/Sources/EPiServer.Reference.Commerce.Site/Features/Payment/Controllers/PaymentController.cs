@@ -20,6 +20,7 @@ using Mediachase.Commerce.Orders.Dto;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Constants;
 using Openpay.EpiCommerce.AddOns.PaymentGateway;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers;
+using Openpay.EpiCommerce.AddOns.PaymentGateway.PageTypes;
 
 namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
 {
@@ -77,12 +78,12 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
                 _paymentManager.GetPaymentMethodBySystemName(OpenpayConfigurationConstants.OpenpaySystemName,
                     SiteContext.Current.LanguageName)?.PaymentMethodParameter;
 
-            //if (RestrictOpenpayPurchaseLimit(ref viewModel, parameters))
-            //{
-            //    return PartialView("_PaymentMethodSelection", viewModel);
-            //}
+            if (RestrictOpenpayPurchaseLimit(ref viewModel, parameters))
+            {
+                return PartialView("_PaymentMethodSelection", viewModel);
+            }
 
-            //viewModel = RestrictOpenpayProductType(viewModel, parameters);
+            viewModel = RestrictOpenpayProductType(viewModel, parameters);
 
             return PartialView("_PaymentMethodSelection", viewModel);
         }
@@ -98,14 +99,13 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
             if (openpayPaymentMethod != null)
             {
                 var totals = _orderGroupCalculator.GetOrderGroupTotals(Cart).Total;
-                var totalInCent = Utilities.ToOpenpayPrice(totals);
                 var minPurchaseLimit = parameters?.FirstOrDefault(x => x.Parameter == OpenpayConfigurationConstants.MinPurchaseLimitParam);
                 var maxPurchaseLimit = parameters?.FirstOrDefault(x => x.Parameter == OpenpayConfigurationConstants.MaxPurchaseLimitParam);
                 if (minPurchaseLimit != null)
                 {
                     decimal minPrice;
                     decimal.TryParse(minPurchaseLimit.Value, out minPrice);
-                    if (minPrice > 0 && totalInCent < minPrice)
+                    if (minPrice > 0 && totals < minPrice)
                     {
                         RemoveOpenpayFromPaymentList(ref viewModel);
                         return true;
@@ -116,7 +116,7 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
                 {
                     decimal maxPrice;
                     decimal.TryParse(maxPurchaseLimit.Value, out maxPrice);
-                    if (maxPrice > 0 && totalInCent > maxPrice)
+                    if (maxPrice > 0 && totals > maxPrice)
                     {
                         RemoveOpenpayFromPaymentList(ref viewModel);
                         return true;
@@ -133,9 +133,12 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
         private PaymentMethodSelectionViewModel RestrictOpenpayProductType(PaymentMethodSelectionViewModel viewModel, PaymentMethodDto.PaymentMethodParameterDataTable parameters)
         {
             var configItemId = parameters?.FirstOrDefault(x => x.Parameter == OpenpayConfigurationConstants.ExcludedProductConfigItem);
-            if (configItemId != null)
+            if (configItemId == null || string.IsNullOrWhiteSpace(configItemId.Value))
             {
-                var pageRef = new PageReference(configItemId.Value);
+                return viewModel;
+            }
+
+            var pageRef = new PageReference(configItemId.Value);
                 
                 // Get configured product types needed to be excluded
                 var configPage = _contentLoader.Get<OpenpayConfigurationPage>(pageRef);
@@ -149,7 +152,7 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
                 _excludeNodeList = _contentLoader.GetItems(excludeIdList, _languageResolver.GetPreferredCulture()).OfType<NodeContentBase>().ToList();
 
                 // Check if current cart contain excluded product types
-                foreach (var shipment in Cart.GetFirstForm().Shipments)
+                foreach (var shipment in Cart.Forms.SelectMany(x => x.Shipments))
                 {
                     var codes = shipment.LineItems.Select(x => x.Code);
                     var entries = _contentLoader.GetItems(
@@ -180,7 +183,6 @@ namespace EPiServer.Reference.Commerce.Site.Features.Payment.Controllers
                 {
                     RemoveOpenpayFromPaymentList(ref viewModel);
                 }
-            }
 
             return viewModel;
         }

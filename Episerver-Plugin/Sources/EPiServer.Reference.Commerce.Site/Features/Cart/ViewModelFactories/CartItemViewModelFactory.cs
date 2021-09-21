@@ -99,9 +99,20 @@ namespace EPiServer.Reference.Commerce.Site.Features.Cart.ViewModelFactories
 
         private Money? GetDiscountedPrice(ICart cart, ILineItem lineItem)
         {
-            return cart.Name.Equals(_cartService.DefaultWishListName) ? 
-                _pricingService.GetDiscountPrice(lineItem.Code)?.UnitPrice : 
-                _pricingService.GetDiscountedPrice(lineItem, cart.Currency);
+            var price = new Money?();
+            if (cart.Name.Equals(_cartService.DefaultWishListName))
+            {
+                price = _pricingService.GetDiscountPrice(lineItem.Code)?.UnitPrice;
+            }
+            else
+            {
+                price = _pricingService.GetDiscountedPrice(lineItem, cart.Currency);
+            }
+
+            return price;
+            //return cart.Name.Equals(_cartService.DefaultWishListName) ? 
+            //    _pricingService.GetDiscountPrice(lineItem.Code)?.UnitPrice : 
+            //    _pricingService.GetDiscountedPrice(lineItem, cart.Currency);
         }
     }
 }

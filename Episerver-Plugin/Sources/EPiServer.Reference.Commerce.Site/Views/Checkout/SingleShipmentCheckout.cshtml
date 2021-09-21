@@ -62,14 +62,14 @@
     </div>
 
     <div class="row section-box">
-        <div class="col-xs-12">
+        <div id="LargeCartId" class="col-xs-12">
             @{ Html.RenderAction("LargeCart", "Cart"); }
         </div>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.Message))
     {
-        <div class="alert alert-warning">
+        <div class="alert alert-danger">
             @Model.Message
         </div>
     }
@@ -94,7 +94,7 @@
             <div id="billingAddressContainer" class="col-md-6 col-xs-12">
                 @{ Html.RenderPartial("BillingAddress", Model); }
             </div>
-            <div class="col-md-6 col-xs-12">
+            <div id="PaymentSelectionId" class="col-md-6 col-xs-12">
                 @{ Html.RenderAction("PaymentMethodSelection", "Payment"); }
             </div>
         </div>
