@@ -11,29 +11,26 @@ using EPiServer;
 using EPiServer.Core;
 using EPiServer.DataAbstraction;
 using EPiServer.DataAccess;
+using EPiServer.Logging;
 using EPiServer.Security;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes;
 
 namespace Openpay.EpiCommerce.AddOns.PaymentGateway.ScheduledJobs
 {
-    [ScheduledPlugIn(DisplayName = "Get Openpay Purchase Limits", Description = "Get the minimum and maximum price range from Openpay", GUID = "91dcd915-01ac-409a-ba02-3754d688df9a")]
+    [ScheduledPlugIn(
+        DisplayName = "Openpay Get Purchase Limits", 
+        Description = "Get the minimum and maximum price range from Openpay", 
+        GUID = "91dcd915-01ac-409a-ba02-3754d688df9a")]
     public class GetOpenpayPurchaseLimits : ScheduledJobBase
     {
         private bool _stopSignaled;
         private IContentRepository _contentRepo;
-        private IContentTypeRepository _contentTypeRepo;
-        private IContentModelUsage _contentModelUsage;
+        private readonly ILogger Logger = LogManager.GetLogger(typeof(GetOpenpayPurchaseLimits));
 
-
-        public GetOpenpayPurchaseLimits(
-            IContentRepository contentRepo,
-            IContentTypeRepository contentTypeRepo,
-            IContentModelUsage contentModelUsage)
+        public GetOpenpayPurchaseLimits(IContentRepository contentRepo)
         {
             IsStoppable = true;
             _contentRepo = contentRepo;
-            _contentTypeRepo = contentTypeRepo;
-            _contentModelUsage = contentModelUsage;
         }
 
         /// <summary>
@@ -97,6 +94,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.ScheduledJobs
             }
             catch (Exception e)
             {
+                Logger.Error(e.Message +  e.Source);
                 return String.Format("Unable to save Openpay payment purchase limit, exception: {0} - {1}", e.Message, e.InnerException);
             }
 

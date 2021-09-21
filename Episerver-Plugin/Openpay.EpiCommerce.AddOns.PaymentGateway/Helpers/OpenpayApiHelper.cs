@@ -29,7 +29,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
         public static PurchaseLimits GetPurchaseLimitsApi(OpenpayConfiguration configuration)
         {
-            var result = CallOpenpayGetApi<PurchaseLimits>(configuration, CommonConstants.OpenpayGetPurchaseLimitsApiEndPoint);
+            var result = CallOpenpayGetApi<PurchaseLimits>(configuration, CommonConstants.OpenpayGetPurchaseLimitsApiEndPoint, queryStringParam: "?origin=Online");
             result.MaxPrice /= 100;
             result.MinPrice /= 100;
             return result;
@@ -42,7 +42,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
                 return null;
             }
 
-            var response = CallOpenpayGetApi<Order>(config, CommonConstants.OpenpayGetOrderByIdApiEndPoint, orderId, timeoutRetry);
+            var response = CallOpenpayGetApi<Order>(config, CommonConstants.OpenpayGetOrderByIdApiEndPoint, orderId, timeoutRetry: timeoutRetry);
             return response;
         }
 
@@ -92,10 +92,10 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
         #region Private method
 
-        private static T CallOpenpayGetApi<T>(OpenpayConfiguration config, string endPoint, string variedParam = null, bool timeoutRetry = false)
+        private static T CallOpenpayGetApi<T>(OpenpayConfiguration config, string endPoint, string variedParam = null, string queryStringParam = null, bool timeoutRetry = false)
         {
             var apiUrl = GetApiUrlByRegion(config.SelectedRegion, config.SelectedEnvironment == OpenpayEnvironment.Production);
-            var apiFullPath = $"{apiUrl}{endPoint}{variedParam}";
+            var apiFullPath = $"{apiUrl}{endPoint}{variedParam}{queryStringParam}";
 
             var authToken = $"{config.Username}:{config.Password}";
             var authUsernamePassword = Encoding.ASCII.GetBytes(authToken);
@@ -114,15 +114,19 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             {
                 try
                 {
-                    LogRequest("GET", $"{apiUrl}{endPoint}", variedParam, authToken);
+                    LogRequest("GET", $"{apiUrl}{endPoint}", variedParam + queryStringParam, authToken);
                     var response = client.GetAsync(apiFullPath).Result;
+                    var responseResult = response.Content.ReadAsStringAsync().Result;
+
                     if (response.IsSuccessStatusCode)
                     {
-                        var responseResult = response.Content.ReadAsStringAsync().Result;
+                        _logger.Information($"responseResult: {responseResult}");
                         return JsonConvert.DeserializeObject<T>(responseResult);
                     }
 
-                    throw new WebException($"{response.StatusCode} - {response.RequestMessage}");
+                    var errorResult = JsonConvert.DeserializeObject<ErrorResponseResult>(responseResult);
+                    _logger.Error($"{config.Environment}. {errorResult.Title}. {errorResult.Detail}: {errorResult.Errors}");
+                    throw new WebException($"{errorResult.Title} - {errorResult.Detail}");
                 }
                 catch (WebException e)
                 {
@@ -173,14 +177,16 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
                     LogRequest("POST", apiFullPath, paramObject, authToken);
                     var response = client.PostAsync(apiFullPath, data).Result;
                     var responseResult = response.Content.ReadAsStringAsync().Result;
-                    _logger.Information($"responseResult: {responseResult}");
                     if (response.IsSuccessStatusCode)
                     {
                         var result = JsonConvert.DeserializeObject<T>(responseResult);
+                        _logger.Information($"responseResult: {result}");
                         return result;
                     }
 
-                    throw new Exception(responseResult);
+                    var errorResult = JsonConvert.DeserializeObject<ErrorResponseResult>(responseResult);
+                    _logger.Error($"{config.Environment}. {errorResult.Title}. {errorResult.Detail}: {errorResult.Errors}");
+                    throw new WebException($"{errorResult.Title} - {errorResult.Detail}");
                 }
                 catch (Exception e)
                 {

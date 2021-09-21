@@ -11,7 +11,7 @@
             maxEligibleAmount: @Model.MaxEligibleAmount,
             type: "@Model.Type"
         };
-        var currency = "@Model.Currency";
+        var currency = "@Html.Raw(Model.Currency)";
         if (currency) {
             configObject.currency = currency;
         }

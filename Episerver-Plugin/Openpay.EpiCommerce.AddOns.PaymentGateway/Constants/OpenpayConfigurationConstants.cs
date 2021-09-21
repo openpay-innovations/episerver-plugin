@@ -21,8 +21,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Constants
 
             public static class Production
             {
-                public const string ApiUrl = "";
-                public const string HandoverUrl = "";
+                public const string ApiUrl = "https://api.myopenpay.com.au/v1/merchant";
+                public const string HandoverUrl = "https://retailer.myopenpay.com.au/websaleslive/?TransactionToken=";
             }
         }
 
@@ -36,8 +36,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Constants
 
             public static class Production
             {
-                public const string ApiUrl = "";
-                public const string HandoverUrl = "";
+                public const string ApiUrl = "https://api.myopenpay.co.uk/v1/merchant";
+                public const string HandoverUrl = "https://websales.myopenpay.co.uk/?TransactionToken=";
             }
         }
 
@@ -45,14 +45,14 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Constants
         {
             public static class Sandbox
             {
-                public const string ApiUrl = "";
-                public const string HandoverUrl = "";
+                public const string ApiUrl = "https://api.training.myopenpay.com/v1/merchant";
+                public const string HandoverUrl = "https://websales.training.myopenpay.com/?TransactionToken=";
             }
 
             public static class Production
             {
-                public const string ApiUrl = "";
-                public const string HandoverUrl = "";
+                public const string ApiUrl = "https://api.myopenpay.com/v1/merchant";
+                public const string HandoverUrl = "https://websales.myopenpay.com/?TransactionToken=";
             }
         }
 

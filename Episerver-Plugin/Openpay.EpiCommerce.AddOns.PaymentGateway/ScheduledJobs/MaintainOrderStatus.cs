@@ -12,7 +12,10 @@ using System.Linq;
 
 namespace Openpay.EpiCommerce.AddOns.PaymentGateway.ScheduledJobs
 {
-    [ScheduledPlugIn(DisplayName = "Maintain Openpay Order Status", Description = "To maintain the correct order status at merchants as well as Openpay end", GUID = "24a6dba8-0ab8-4d5d-a869-a096d1f7ec83")]
+    [ScheduledPlugIn(
+        DisplayName = "Openpay Maintain Order Status", 
+        Description = "To maintain the correct order status at merchants as well as Openpay end", 
+        GUID = "24a6dba8-0ab8-4d5d-a869-a096d1f7ec83")]
     public class MaintainOrderStatus : ScheduledJobBase
     {
         private bool _stopSignaled;

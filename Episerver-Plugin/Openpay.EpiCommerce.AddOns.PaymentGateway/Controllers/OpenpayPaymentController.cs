@@ -11,9 +11,11 @@ using EPiServer.ServiceLocation;
 using EPiServer.Editor;
 using EPiServer.Security;
 using EPiServer.Web;
+using EPiServer.Web.Routing;
 using Mediachase.Commerce.Orders;
 using Mediachase.Commerce.Orders.Exceptions;
 using Mediachase.Commerce.Security;
+using Openpay.EpiCommerce.AddOns.PaymentGateway.Constants;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Enums;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.PageTypes;
@@ -23,15 +25,18 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Controllers
     public class OpenpayPaymentController : PageController<OpenpayPaymentHandlerPage>
     {
         private readonly IOrderRepository _orderRepository;
+        private static UrlResolver _urlResolver;
 
         public OpenpayPaymentController() : this(
-            ServiceLocator.Current.GetInstance<IOrderRepository>()
+            ServiceLocator.Current.GetInstance<IOrderRepository>(),
+            ServiceLocator.Current.GetInstance<UrlResolver>()
         )
         { }
 
-        public OpenpayPaymentController(IOrderRepository orderRepository)
+        public OpenpayPaymentController(IOrderRepository orderRepository, UrlResolver urlResolver)
         {
             _orderRepository = orderRepository;
+            _urlResolver = urlResolver;
         }
 
         public ActionResult Index()
@@ -41,23 +46,27 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Controllers
                 return new EmptyResult();
             }
 
+            var homePageUrl = _urlResolver.GetUrl(ContentReference.StartPage);
+
             var currentCart = _orderRepository.LoadCart<ICart>(PrincipalInfo.CurrentPrincipal.GetContactId(), Cart.DefaultName);
-            if (!currentCart.Forms.Any() || !currentCart.GetFirstForm().Payments.Any())
+            if (currentCart == null || !currentCart.Forms.Any() || !currentCart.GetFirstForm().Payments.Any())
             {
-                throw new PaymentException(PaymentException.ErrorType.ProviderError, "", Utilities.Translate("GenericError"));
+                return Redirect(homePageUrl);
             }
 
             var openpayConfiguration = new OpenpayConfiguration();
             var payment = currentCart.Forms.SelectMany(f => f.Payments).FirstOrDefault(c => c.PaymentMethodId.Equals(openpayConfiguration.PaymentMethodId));
             if (payment == null)
             {
-                throw new PaymentException(PaymentException.ErrorType.ProviderError, "", Utilities.Translate("PaymentNotSpecified"));
+                return Redirect(homePageUrl);
             }
 
-            var openpayOrderId = payment.Properties[Constants.OpenpayConfigurationConstants.OpenpayOrderId] as string;
-            if (string.IsNullOrEmpty(openpayOrderId))
+            var merchantOrderId = payment.Properties[OpenpayConfigurationConstants.MerchantOrderId].ToString();
+            var openpayOrderId = payment.Properties[OpenpayConfigurationConstants.OpenpayOrderId] as string;
+            var queryStringOrderId = Request.QueryString["orderid"];
+            if (string.IsNullOrWhiteSpace(merchantOrderId) || string.IsNullOrWhiteSpace(openpayOrderId) || string.IsNullOrWhiteSpace(queryStringOrderId) || merchantOrderId != queryStringOrderId)
             {
-                throw new PaymentException(PaymentException.ErrorType.ProviderError, "", Utilities.Translate("PaymentNotSpecified"));
+                return Redirect(homePageUrl);
             }
 
             // Redirect customer to receipt page

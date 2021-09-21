@@ -157,7 +157,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             var priceLimitValid = Utilities.ValidatePurchasePriceLimit(payment.Amount, _openpayConfiguration);
             if (!priceLimitValid)
             {
-                return PaymentProcessingResult.CreateUnsuccessfulResult(Utilities.Translate("InvalidPurchasePrice"));
+                var mess = string.Format(Utilities.Translate("InvalidPurchasePrice"), _openpayConfiguration.MinPurchaseLimit, _openpayConfiguration.MaxPurchaseLimit);
+                return PaymentProcessingResult.CreateUnsuccessfulResult(mess);
             }
 
             var excludeProductValid = Utilities.ValidateProhibitedProducts(cart, _openpayConfiguration.ExcludedProductConfigItem);
@@ -191,16 +192,12 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             {
                 return PaymentProcessingResult.CreateUnsuccessfulResult(Utilities.Translate("OpenpaySettingsError"));
             }
-            var merchantOrderId = _orderNumberGenerator.GenerateOrderNumber(cart);
-
-            var requestModel = GetRequestModel(cart, orderForm, payment, merchantOrderId);
-            if (requestModel == null)
-            {
-                return PaymentProcessingResult.CreateUnsuccessfulResult(Utilities.Translate("InvalidCustomerInfo"));
-            }
 
             try
             {
+                var merchantOrderId = _orderNumberGenerator.GenerateOrderNumber(cart);
+                var requestModel = GetRequestModel(cart, orderForm, payment, merchantOrderId);
+                // Call create new order Openpay api
                 var response = OpenpayApiHelper.SendNewOrderCreationRequest(requestModel, _openpayConfiguration);
                 // save response detail to payment
                 payment.Properties[OpenpayConfigurationConstants.OpenpayOrderId] = response.OrderId;
@@ -222,9 +219,13 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             catch (Exception e)
             {
                 _logger.Error(e.Message + e.InnerException);
+                if (e is WebException)
+                {
+                    return PaymentProcessingResult.CreateUnsuccessfulResult(e.Message);
+                }
             }
 
-            return PaymentProcessingResult.CreateUnsuccessfulResult(Utilities.Translate("CheckoutProcessError"));
+            return PaymentProcessingResult.CreateUnsuccessfulResult(Utilities.Translate("FailureMessage"));
         }
 
         private CreationNewOrderRequest GetRequestModel(ICart cart, IOrderForm orderForm, IPayment payment, string merchantOrderId)
@@ -233,11 +234,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             var shippingAddress = orderForm.Shipments.FirstOrDefault();
             var billingAddress = payment.BillingAddress;
 
-            var customerValidation = ValidateCustomerInfo(billingAddress, shippingAddress?.ShippingAddress);
-            if (!customerValidation)
-            {
-                return null;
-            }
+            ValidateBillingAddress(billingAddress);
 
             #region Preparation
 
@@ -247,7 +244,6 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             var pageUrl = UrlResolver.Current.GetUrl(callbackItemRef,
                 routeHelper.LanguageID,
                 new VirtualPathArguments { ContextMode = ContextMode.Default });
-            
             var absoluteUrl = new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}{pageUrl}");
 
             // build cart model
@@ -272,20 +268,32 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
                 }
             }
 
-            // build delivery address model
+            // delivery method
             Address deliveryAddress = null;
-            if (shippingAddress?.ShippingAddress != null)
+
+            var deliveryMethod =
+                shippingAddress?.ShippingAddress == null ||
+                string.IsNullOrWhiteSpace(shippingAddress.ShippingAddress.Line1) &&
+                string.IsNullOrWhiteSpace(shippingAddress.ShippingAddress.Line2)
+                    ? DeliveryMethod.Email
+                    : DeliveryMethod.Delivery;
+
+            if (deliveryMethod != DeliveryMethod.Email)
             {
-                deliveryAddress = new Address
+                ValidateDeliveryAddress(shippingAddress?.ShippingAddress);
+                // build delivery address model
+                if (shippingAddress?.ShippingAddress != null)
                 {
-                    Line1 = shippingAddress.ShippingAddress.Line1,
-                    Line2 = shippingAddress.ShippingAddress.Line2,
-                    Suburb = shippingAddress.ShippingAddress.City,
-                    State = shippingAddress.ShippingAddress.RegionCode,
-                    PostCode = shippingAddress.ShippingAddress.PostalCode
-                };
+                    deliveryAddress = new Address
+                    {
+                        Line1 = shippingAddress.ShippingAddress.Line1,
+                        Line2 = shippingAddress.ShippingAddress.Line2,
+                        Suburb = shippingAddress.ShippingAddress.City,
+                        State = shippingAddress.ShippingAddress.RegionCode,
+                        PostCode = shippingAddress.ShippingAddress.PostalCode
+                    };
+                }
             }
-            
 
             // build residential address model
             var residentialAddress = new Address
@@ -297,6 +305,12 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
                 PostCode = billingAddress.PostalCode
             };
 
+            // build Customer phonenumber
+            var phoneNumber = !string.IsNullOrWhiteSpace(billingAddress.DaytimePhoneNumber) ? billingAddress.DaytimePhoneNumber : 
+                !string.IsNullOrWhiteSpace(billingAddress.EveningPhoneNumber) ? billingAddress.EveningPhoneNumber: 
+                shippingAddress != null && !string.IsNullOrWhiteSpace(shippingAddress.ShippingAddress?.DaytimePhoneNumber) ? shippingAddress.ShippingAddress.DaytimePhoneNumber :
+                shippingAddress?.ShippingAddress?.EveningPhoneNumber;
+            
             #endregion
 
             var requestModel = new CreationNewOrderRequest
@@ -315,11 +329,11 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
                             FirstName = billingAddress.FirstName,
                             FamilyName = billingAddress.LastName,
                             Email = billingAddress.Email,
-                            PhoneNumber = billingAddress.DaytimePhoneNumber,
+                            PhoneNumber = phoneNumber,
                             ResidentialAddress = residentialAddress,
                             DeliveryAddress = deliveryAddress
                         },
-                        DeliveryMethod = deliveryAddress == null ? DeliveryMethod.Email.ToString() : DeliveryMethod.Delivery.ToString()
+                        DeliveryMethod = deliveryMethod.ToString()
                     }
                 },
                 PurchasePrice = Utilities.ToOpenpayPrice(payment.Amount),
@@ -352,10 +366,13 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             }
 
             var openpayOrderId = (string)orderGroup.Properties[OpenpayConfigurationConstants.OpenpayOrderId];
+
             // Check status of Openpay plan
             var orderStatus = OpenpayApiHelper.GetOrderStatusApi(openpayOrderId, _openpayConfiguration);
             if (orderStatus == null || orderStatus.PlanStatus != OpenpayPlanStatus.Active.ToString())
             {
+                var noteMessage = orderStatus == null ? "Cannot get order status from Openpay" : $"Openpay plan status({orderStatus.PlanStatus}) is different from Active";
+                Utilities.AddNoteToPurchaseOrder("REFUND", noteMessage, purchaseOrder.CustomerId, purchaseOrder);
                 return RefundError(Utilities.Translate("PlanStatusIsNotActive"), purchaseOrder);
             }
 
@@ -365,6 +382,11 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             // Openpay doesn't support refund more than purchase price
             if (newPurchasePrice >= orderStatus.PurchasePrice || reducePriceBy > orderStatus.PurchasePrice)
             {
+                var noteMessage = reducePriceBy > orderStatus.PurchasePrice 
+                    ? $"Refund amount({reducePriceBy}) is greater than remaining Openpay plan purchase price({orderStatus.PurchasePrice})" 
+                    : $"New plan purchase price({newPurchasePrice}) is greater than current plan purchase price({orderStatus.PurchasePrice})";
+
+                Utilities.AddNoteToPurchaseOrder("REFUND", noteMessage, purchaseOrder.CustomerId, purchaseOrder);
                 return RefundError(Utilities.Translate("RefundMoreThanPurchasePrice"), purchaseOrder);
             }
 
@@ -701,34 +723,23 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway
             return redirectionUrl;
         }
 
-        private bool ValidateCustomerInfo(IOrderAddress billingAddress, IOrderAddress deliveryAddress)
+        private void ValidateBillingAddress(IOrderAddress billingAddress)
         {
-            if (
-                billingAddress == null ||
-                string.IsNullOrWhiteSpace(billingAddress.FirstName) ||
-                string.IsNullOrWhiteSpace(billingAddress.LastName) ||
-                string.IsNullOrWhiteSpace(billingAddress.Email) ||
-                string.IsNullOrWhiteSpace(billingAddress.Line1) ||
-                string.IsNullOrWhiteSpace(billingAddress.City) ||
-                string.IsNullOrWhiteSpace(billingAddress.RegionCode) ||
-                string.IsNullOrWhiteSpace(billingAddress.PostalCode)
-            )
-            {
-                return false;
-            }
+            billingAddress.FirstName = !string.IsNullOrWhiteSpace(billingAddress.FirstName) ? billingAddress.FirstName : "-";
+            billingAddress.LastName = !string.IsNullOrWhiteSpace(billingAddress.LastName) ? billingAddress.LastName : "-";
+            billingAddress.Email = !string.IsNullOrWhiteSpace(billingAddress.Email) ? billingAddress.Email : "-";
+            billingAddress.Line1 = !string.IsNullOrWhiteSpace(billingAddress.Line1) ? billingAddress.Line1 : "-";
+            billingAddress.City = !string.IsNullOrWhiteSpace(billingAddress.City) ? billingAddress.City : "-";
+            billingAddress.RegionCode = !string.IsNullOrWhiteSpace(billingAddress.RegionCode) ? billingAddress.RegionCode : "-";
+            billingAddress.PostalCode = !string.IsNullOrWhiteSpace(billingAddress.PostalCode) ? billingAddress.PostalCode : "-";
+        }
 
-            if (
-                deliveryAddress != null &&
-                (string.IsNullOrWhiteSpace(deliveryAddress.Line1) ||
-                string.IsNullOrWhiteSpace(deliveryAddress.City) ||
-                string.IsNullOrWhiteSpace(deliveryAddress.RegionCode) ||
-                string.IsNullOrWhiteSpace(deliveryAddress.PostalCode))
-            )
-            {
-                return false;
-            }
-
-            return true;
+        private void ValidateDeliveryAddress(IOrderAddress deliveryAddress)
+        {
+            deliveryAddress.Line1 = !string.IsNullOrWhiteSpace(deliveryAddress.Line1) ? deliveryAddress.Line1 : "-";
+            deliveryAddress.City = !string.IsNullOrWhiteSpace(deliveryAddress.City) ? deliveryAddress.City : "-";
+            deliveryAddress.RegionCode = !string.IsNullOrWhiteSpace(deliveryAddress.RegionCode) ? deliveryAddress.RegionCode : "-";
+            deliveryAddress.PostalCode = !string.IsNullOrWhiteSpace(deliveryAddress.PostalCode) ? deliveryAddress.PostalCode : "-";
         }
 
         /// <summary>

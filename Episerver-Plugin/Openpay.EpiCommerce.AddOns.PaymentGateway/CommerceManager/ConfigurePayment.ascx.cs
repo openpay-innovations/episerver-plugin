@@ -6,6 +6,7 @@ using Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPiServer.Logging;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Constants;
@@ -62,6 +63,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.CommerceManager
             {
                 ErrorMessage.Text = $"\n Incorrect credential, please check your username/password !";
                 ErrorMessage.Text += $"\n Error: {e.Message}";
+                SuccessMessage.Text = "";
                 return;
             }
 
@@ -95,7 +97,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.CommerceManager
                 {
                     Logger.Error($"{e.Message} - {e.StackTrace}");
                     ErrorMessage.Text = $"{e.Message} - {e.StackTrace}";
-                }
+                    SuccessMessage.Text = "";
+                }   
             }
         }
 
@@ -147,15 +150,18 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.CommerceManager
                 {
                     this.MinPurchaseLimit.Text = purchaseLimits.MinPrice.ToString();
                     this.MaxPurchaseLimit.Text = purchaseLimits.MaxPrice.ToString();
-                    ErrorMessage.Text = $"Fetch Purchase Limits successful! Remember to save changes.";
+                    SuccessMessage.Text = "Purchase Limits updated successfully! Remember to save changes.";
+                    ErrorMessage.Text = "";
 
                     return;
                 }
                 ErrorMessage.Text = $"\n Your region value is not correct";
+                SuccessMessage.Text = "";
             }
             catch (Exception e)
             {
                 ErrorMessage.Text = $"\n {e.Message}";
+                SuccessMessage.Text = "";
                 Logger.Error($"{e.Message} - {e.StackTrace}");
             }
         }
