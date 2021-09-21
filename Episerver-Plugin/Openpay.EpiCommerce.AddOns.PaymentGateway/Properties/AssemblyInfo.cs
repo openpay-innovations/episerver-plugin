@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Openpay Payment Gateway Addon")]
-[assembly: AssemblyDescription("Openpay is the trusted buy now, pay later solution that boosts business. With the official Openpay extension, Episerver Commerce platform users can easily offer their customers the smarter way to pay")]
+[assembly: AssemblyTitle("Openpay.EpiCommerce.AddOns.PaymentGateway")]
+[assembly: AssemblyDescription("AddOn developed for integrating EpiServer Commerce and Openpay by SmartOSC")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SmartOSC")]
 [assembly: AssemblyProduct("Openpay.EpiCommerce.AddOns.PaymentGateway")]

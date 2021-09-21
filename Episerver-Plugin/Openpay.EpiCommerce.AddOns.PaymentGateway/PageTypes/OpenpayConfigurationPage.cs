@@ -8,10 +8,10 @@ using System.ComponentModel.DataAnnotations;
 using EPiServer.Commerce.Catalog.ContentTypes;
 using Openpay.EpiCommerce.AddOns.PaymentGateway.Constants;
 
-namespace Openpay.EpiCommerce.AddOns.PaymentGateway
+namespace Openpay.EpiCommerce.AddOns.PaymentGateway.PageTypes
 {
     [ContentType(
-        DisplayName = "Openpay Configuration",
+        DisplayName = "Openpay Product Restriction Page",
         GUID = "02857125-a7e3-4bcb-a7e5-d5ce08dff206", 
         Description = "Configure which Product types should be excluded",
         GroupName = CommonConstants.OpenpayTabNames.OpenpayPage)]

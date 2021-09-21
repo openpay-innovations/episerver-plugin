@@ -1,5 +1,8 @@
 ﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.LogoWidgetViewModel
 
-<div class="opy-logo" style="@Model.WrapperCss">
-    <opy-logo color="@Model.Logo"></opy-logo>
-</div>
+@if (Model != null)
+{
+    <div class="opy-logo" style="@Model.WrapperCss">
+        <opy-logo color="@Model.Logo"></opy-logo>
+    </div>
+}

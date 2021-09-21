@@ -11,7 +11,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Constants
         public const string OpenpayLogAppender = "OpenpayLogAppender";
         public const string PlanCreationTypeValue = "Pending";
         public const string EpiserverBrandName = "Optimizely|Episerver CMS";
-        public const string OpenpayProductPriceValue = "OpenpayProductPriceValue";
+        public const string OpenpayProductPriceValue = "OpenpayProductPrice";
+        public const string OpenpayProductCodeValue = "OpenpayProductCode";
 
         public const string OpenpayGetPurchaseLimitsApiEndPoint = "/orders/limits";
         public const string OpenpayRefundApiEndPoint = "/orders/{0}/refund";

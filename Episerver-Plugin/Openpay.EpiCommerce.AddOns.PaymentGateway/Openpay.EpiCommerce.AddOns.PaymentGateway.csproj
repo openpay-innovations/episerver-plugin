@@ -325,6 +325,7 @@
     <Compile Include="Models\CreationNewOrderResponse\NextAction.cs" />
     <Compile Include="Models\CreationNewOrderRequest\OnlineOrigin.cs" />
     <Compile Include="Models\CreationNewOrderRequest\CustomerJourney.cs" />
+    <Compile Include="Models\ErrorResponseResult.cs" />
     <Compile Include="Models\OpenpayOrderId.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\PurchaseLimits.cs" />

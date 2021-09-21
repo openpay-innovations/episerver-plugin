@@ -14,13 +14,14 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Controllers
         public override ActionResult Index(OpenpayProductListingWidgetBlock currentBlock)
         {
             var productPriceValue = ControllerContext.ParentActionViewContext.ViewData[CommonConstants.OpenpayProductPriceValue].ToString();
+            var productCode = ControllerContext.ParentActionViewContext.ViewData[CommonConstants.OpenpayProductPriceValue].ToString();
             decimal.TryParse(productPriceValue, out var productPrice);
             if (productPrice <= 0)
             {
                 return null;
             }
 
-            var model = WidgetViewModelFactory.GetProductListingWidgetViewModel(productPrice);
+            var model = WidgetViewModelFactory.GetProductListingWidgetViewModel(productPrice, productCode);
             return PartialView("OpenpayProductListingWidgetBlock", model);
         }
     }

@@ -2,6 +2,7 @@
 using EPiServer.ServiceLocation;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
         private static List<NodeContentBase> _excludeNodeList;
         private static List<EntryContentBase> _excludeEntryList;
-        private static bool _hasExcludedItem;
+        private static CultureInfo _preferredLang = _languageResolver.Service.GetPreferredCulture();
 
         /// <summary>
         /// Translates with languageKey under /Commerce/Checkout/Openpay/ in lang.xml
@@ -173,19 +174,6 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
                 return true;
             }
 
-            // Get configured product types are prohibited by Openpay
-            var pageRef = new PageReference(excludedProductConfigItemId);
-            var configPage = _contentLoader.Service.Get<OpenpayConfigurationPage>(pageRef);
-            if (configPage?.ExcludedProductTypes == null || !configPage.ExcludedProductTypes.Items.Any())
-                return true;
-
-            var preferredLang = _languageResolver.Service.GetPreferredCulture();
-            var excludeIdList = configPage.ExcludedProductTypes.Items
-                .Select(x => x.ContentLink)
-                .Where(y => !ContentReference.IsNullOrEmpty(y)).ToList();
-            _excludeEntryList = _contentLoader.Service.GetItems(excludeIdList, preferredLang).OfType<EntryContentBase>().ToList();
-            _excludeNodeList = _contentLoader.Service.GetItems(excludeIdList, preferredLang).OfType<NodeContentBase>().ToList();
-            _hasExcludedItem = false;
             // Check if current cart contain excluded product types
             foreach (var shipment in cart.Forms.SelectMany(x => x.Shipments))
             {
@@ -194,27 +182,20 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
                     codes
                         .Select(x => _referenceConverter.Service.GetContentLink(x))
                         .Where(r => !ContentReference.IsNullOrEmpty(r)),
-                    preferredLang).OfType<EntryContentBase>().ToList();
+                    _preferredLang).OfType<EntryContentBase>().ToList();
 
                 foreach (var lineItem in shipment.LineItems)
                 {
                     var entry = entries.FirstOrDefault(x => x.Code == lineItem.Code);
-                    if (entry != null)
+                    if (entry != null && !ValidateContentItem(entry, excludedProductConfigItemId))
                     {
-                        ValidateCartItem(entry);
-                    }
-
-                    // stop if exist excluded product type
-                    if (_hasExcludedItem)
+                        // stop if exist excluded product type
                         return false;
+                    }
                 }
-
-                // stop if exist excluded product type
-                if (_hasExcludedItem)
-                    return false;
             }
 
-            return !_hasExcludedItem;
+            return true;
         }
 
 
@@ -239,34 +220,41 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
         #region private helpers
 
-        private static void ValidateCartItem(EntryContentBase entry)
+        public static bool ValidateContentItem(EntryContentBase entry, string excludedProductConfigItemId)
         {
-            switch (entry.ClassTypeId)
+            // Get configured product types are prohibited by Openpay
+            var pageRef = new PageReference(excludedProductConfigItemId);
+            var configPage = _contentLoader.Service.Get<OpenpayConfigurationPage>(pageRef);
+            if (configPage?.ExcludedProductTypes == null || !configPage.ExcludedProductTypes.Items.Any())
+                return true;
+
+            var excludeIdList = configPage.ExcludedProductTypes.Items
+                .Select(x => x.ContentLink)
+                .Where(y => !ContentReference.IsNullOrEmpty(y)).ToList();
+            _excludeEntryList = _contentLoader.Service.GetItems(excludeIdList, _preferredLang).OfType<EntryContentBase>().ToList();
+            _excludeNodeList = _contentLoader.Service.GetItems(excludeIdList, _preferredLang).OfType<NodeContentBase>().ToList();
+
+            var isValid = true;
+
+            if (entry.ClassTypeId == "Variation")
             {
-                case "Variation":
-                    if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(entry.ContentLink.ID))
-                    {
-                        _hasExcludedItem = true;
-                        break;
-                    }
-                    ValidateParentOfEntry(entry.ContentLink);
-
-                    break;
-
-                case "Package":
-                    if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(entry.ContentLink.ID))
-                    {
-                        _hasExcludedItem = true;
-                        break;
-                    }
-                    ValidateParentOfEntry(entry.ContentLink);
-                    ValidateChildrenOfEntry(entry.ContentLink);
-
-                    break;
+                if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(entry.ContentLink.ID) || !ValidateParentOfEntry(entry.ContentLink))
+                {
+                    isValid = false;
+                }
             }
+            else
+            {
+                if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(entry.ContentLink.ID) || !ValidateParentOfEntry(entry.ContentLink) || !ValidateChildrenOfEntry(entry.ContentLink))
+                {
+                    isValid = false;
+                }
+            }
+
+            return isValid;
         }
 
-        private static void ValidateParentOfEntry(ContentReference entry)
+        private static bool ValidateParentOfEntry(ContentReference entry)
         {
             var parentNodes = _relationRepository.Service.GetParents<NodeRelation>(entry);
             var parentEntries = _relationRepository.Service.GetParents<EntryRelation>(entry);
@@ -275,8 +263,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             {
                 if (_excludeNodeList.Select(x => x.ContentLink.ID).Contains(node.Parent.ID))
                 {
-                    _hasExcludedItem = true;
-                    return;
+                    return false;
                 }
             }
 
@@ -284,13 +271,14 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             {
                 if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(parent.Parent.ID))
                 {
-                    _hasExcludedItem = true;
-                    return;
+                    return false;
                 }
             }
+
+            return true;
         }
 
-        private static void ValidateChildrenOfEntry(ContentReference entry)
+        private static bool ValidateChildrenOfEntry(ContentReference entry)
         {
             var childEntries = _relationRepository.Service.GetChildren<EntryRelation>(entry);
 
@@ -298,12 +286,16 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             {
                 if (_excludeEntryList.Select(x => x.ContentLink.ID).Contains(child.Child.ID))
                 {
-                    _hasExcludedItem = true;
-                    return;
+                    return false;
                 }
 
-                ValidateParentOfEntry(child.Child);
+                if (!ValidateParentOfEntry(child.Child))
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
 
         #endregion
