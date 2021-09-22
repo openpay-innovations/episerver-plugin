@@ -362,6 +362,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="EPiServerLog.config" />
+    <Content Include="images\amber-lozenge-logo.svg" />
     <Content Include="StoreFront\OpenpayInfoBeltWidgetBlock.cshtml" />
     <None Include="StoreFront\OpenpayCheckoutWidgetBlock.cshtml" />
     <None Include="StoreFront\OpenpayLogoWidgetBlock.cshtml" />
