@@ -58,7 +58,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
         [CultureSpecific]
         [Display(
-            Name = "Min Eligible Amount (in lowest denomination)",
+            Name = "Min Eligible Amount",
             Description = "The minimum eligible amount required before Openpay is eligible e.g 50",
             GroupName = CommonConstants.OpenpayTabNames.GeneralConfiguration,
             Order = 4)]
@@ -67,7 +67,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
         [CultureSpecific]
         [Display(
-            Name = "Max Eligible Amount (in lowest denomination)",
+            Name = "Max Eligible Amount",
             Description = "The maximum eligible amount required before Openpay is eligible e.g 1000",
             GroupName = CommonConstants.OpenpayTabNames.GeneralConfiguration,
             Order = 5)]
