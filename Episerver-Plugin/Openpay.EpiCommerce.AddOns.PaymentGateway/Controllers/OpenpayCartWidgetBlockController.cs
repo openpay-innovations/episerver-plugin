@@ -20,7 +20,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Controllers
 
         public override ActionResult Index(OpenpayCartWidgetBlock currentBlock)
         {
-            var model = WidgetViewModelFactory.GetCarWidgetViewModel();
+            var model = WidgetViewModelFactory.GetCartWidgetViewModel();
             return PartialView("OpenpayCartWidgetBlock", model);
         }
     }

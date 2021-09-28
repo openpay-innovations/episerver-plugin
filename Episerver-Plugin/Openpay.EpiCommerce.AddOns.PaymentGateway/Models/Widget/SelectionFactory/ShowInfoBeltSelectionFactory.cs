@@ -16,7 +16,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.SelectionFacto
                 },
                 new SelectItem
                 {
-                    Text = "All Page",
+                    Text = "All Pages",
                     Value = ShowInfoBeltOption.AllPage.ToString()
                 },
                 new SelectItem

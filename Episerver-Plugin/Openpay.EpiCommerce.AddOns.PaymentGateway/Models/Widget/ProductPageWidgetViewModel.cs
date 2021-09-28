@@ -8,7 +8,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget
 {
     public class ProductPageWidgetViewModel : WidgetViewModelBase
     {
-        public decimal ProductPrice { get; set; }
+        public string ProductPrice { get; set; }
         public string ProductPageLogo { get; set; }
         public string ProductPageLogoPosition { get; set; }
         public string ProductPageLearnMoreText { get; set; }

@@ -33,7 +33,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Constants
             public const string ProductListingWidgetConfiguration = "Product Listing Widget";
             public const string GeneralConfiguration = "General Configuration";
             public const string CartWidgetConfiguration = "Cart Widget";
-            public const string ProductPageWidgetConfiguration = "ProductPage Widget";
+            public const string ProductPageWidgetConfiguration = "Product Page Widget";
             public const string LearnMorePopupConfiguration = "Learn More Popup";
             public const string CheckoutWidgetConfiguration = "Checkout Page Widget";
         }
