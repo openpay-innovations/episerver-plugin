@@ -109,7 +109,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
         [CultureSpecific]
         [Display(
-            Name = "InfoBelt Logo",
+            Name = "Info Belt Color",
             Description = "Openpay Logo to use that suits your website background",
             GroupName = CommonConstants.OpenpayTabNames.InfoBeltWidgetConfiguration,
             Order = 1)]
@@ -165,7 +165,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
         [CultureSpecific]
         [Display(
-            Name = "Show ProductPage Widget",
+            Name = "Show Product Page Widget",
             GroupName = CommonConstants.OpenpayTabNames.ProductPageWidgetConfiguration,
             Order = 1)]
         public virtual bool ShowProductPageWidget { get; set; }
@@ -284,7 +284,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
         [CultureSpecific]
         [Display(
-            Name = "Show Learn More Widget",
+            Name = "Show Learn More Link Widget",
             GroupName = CommonConstants.OpenpayTabNames.CheckoutWidgetConfiguration,
             Order = 1)]
         public virtual bool ShowLearnMoreWidget { get; set; }
@@ -356,6 +356,11 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
 
             // Set learn more popup
             LogoWidget = "amber";
+
+            // set info-icon empty by default
+            CartInfoIcon = "";
+            ProductPageInfoIcon = "";
+            LearnMoreInfoIcon = "";
         }
     }
 }

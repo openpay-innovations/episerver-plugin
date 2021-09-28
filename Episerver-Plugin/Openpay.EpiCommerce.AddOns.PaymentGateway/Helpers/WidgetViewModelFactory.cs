@@ -57,7 +57,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
             var viewModel = new ProductPageWidgetViewModel
             {
-                ProductPrice = productPrice,
+                ProductPrice = string.Format("{0:0.00}", productPrice),
                 ProductPageLogo = configBlock.ProductPageLogo,
                 ProductPageLearnMoreText = configBlock.ProductPageLearnMoreText,
                 ProductPageLogoPosition = configBlock.ProductPageLogoPosition,
@@ -81,7 +81,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             {
                 ProductPrice = productPrice,
                 ShowWidget = configBlock.ShowProductListingWidget,
-                HideLogo = configBlock.ProductListingHideLogo,
+                HideLogo = configBlock.ProductListingHideLogo.ToString().ToLower(),
                 ListingPageWidgetLogo = configBlock.ProductListingWidgetLogo,
                 WrapperCss = configBlock.WrapperCss
             };
@@ -89,7 +89,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
             return model;
         }
 
-        public static CartWidgetViewModel GetCarWidgetViewModel()
+        public static CartWidgetViewModel GetCartWidgetViewModel()
         {
             var configBlock = GetConfigurationBlock();
             var orderRepository = ServiceLocator.Current.GetInstance<IOrderRepository>();
