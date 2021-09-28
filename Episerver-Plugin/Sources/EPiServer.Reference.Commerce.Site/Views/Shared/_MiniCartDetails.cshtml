@@ -87,7 +87,7 @@
             <ul class="list-unstyled cart-dropdown__button-list">
                 <li class="cart-item">
                     @{
-                        var cartWidgetDataModel = WidgetViewModelFactory.GetCarWidgetViewModel();
+                        var cartWidgetDataModel = WidgetViewModelFactory.GetCartWidgetViewModel();
                         if (cartWidgetDataModel != null)
                         {
                             Html.RenderPartial("OpenpayCartWidgetBlock", cartWidgetDataModel);

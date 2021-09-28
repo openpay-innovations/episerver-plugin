@@ -2,14 +2,13 @@
 
 @if (Model != null)
 {
-
     <script src="https://widgets.openpay.com.au/lib/openpay-widgets.min.js"></script>
     <script>
         var configObject = {
             region: "@Model.Region",
             planTiers: [@(string.Join(",", Model.PlanTiers))],
-            minEligibleAmount: @Html.Raw(Model.MinEligibleAmount),
-            maxEligibleAmount: @Html.Raw(Model.MaxEligibleAmount),
+            minEligibleAmount: @Model.MinEligibleAmount,
+            maxEligibleAmount: @Model.MaxEligibleAmount,
             type: "@Model.Type"
         };
         var currency = "@Html.Raw(Model.Currency)";
