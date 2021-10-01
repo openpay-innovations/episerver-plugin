@@ -79,7 +79,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Helpers
 
             var model = new ProductListingWidgetViewModel
             {
-                ProductPrice = productPrice,
+                ProductPrice = string.Format("{0:0.00}", productPrice),
                 ShowWidget = configBlock.ShowProductListingWidget,
                 HideLogo = configBlock.ProductListingHideLogo.ToString().ToLower(),
                 ListingPageWidgetLogo = configBlock.ProductListingWidgetLogo,

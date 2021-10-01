@@ -167,7 +167,7 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.BlockTypes
         [Display(
             Name = "Show Product Page Widget",
             GroupName = CommonConstants.OpenpayTabNames.ProductPageWidgetConfiguration,
-            Order = 1)]
+            Order = 5)]
         public virtual bool ShowProductPageWidget { get; set; }
 
         [CultureSpecific]
