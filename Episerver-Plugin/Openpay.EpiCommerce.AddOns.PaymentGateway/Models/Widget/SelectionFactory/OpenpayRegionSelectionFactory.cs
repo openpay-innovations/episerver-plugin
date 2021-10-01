@@ -15,7 +15,8 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget
             return new List<ISelectItem>
             {
                 new SelectItem{ Text = OpenpayRegion.AU.ToString(), Value = OpenpayRegion.AU.ToString()},
-                new SelectItem{ Text = OpenpayRegion.UK.ToString(), Value = OpenpayRegion.UK.ToString()}
+                new SelectItem{ Text = OpenpayRegion.UK.ToString(), Value = OpenpayRegion.UK.ToString()},
+                new SelectItem{ Text = "US", Value = "US"}
             };
         }
     }

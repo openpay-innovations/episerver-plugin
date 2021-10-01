@@ -10,6 +10,11 @@ namespace Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.SelectionFacto
             return new ISelectItem[] {
                 new SelectItem
                 {
+                    Text = "None",
+                    Value = ""
+                },
+                new SelectItem
+                {
                     Text = "Grey",
                     Value = "grey"
                 },
