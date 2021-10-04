@@ -1,0 +1,8 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.LearnMoreLinkWidgetViewModel
+
+@if (Model != null)
+{
+    <div class="opy-learn-more-button" style="@Model.WrapperCss">
+        <opy-learn-more-button more-info-text="@Model.LearnMoreLinkText" info-icon="@Model.LearnMoreInfoIcon"></opy-learn-more-button>
+    </div>
+}

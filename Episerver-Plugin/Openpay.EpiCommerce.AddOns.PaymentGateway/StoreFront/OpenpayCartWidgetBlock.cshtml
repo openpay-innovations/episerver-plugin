@@ -1,0 +1,14 @@
+﻿@model Openpay.EpiCommerce.AddOns.PaymentGateway.Models.Widget.CartWidgetViewModel
+
+@if (Model != null && Model.ShowCartWidget)
+{
+    <div class="opy-cart" style="@Model.WrapperCss">
+        <opy-cart
+            amount="@Model.CartTotal"
+            logo="@Model.Logo"
+            more-info-text="@Model.LearnMoreText"
+            info-icon="@Model.InfoIcon"
+        >
+        </opy-cart>
+    </div>
+}
